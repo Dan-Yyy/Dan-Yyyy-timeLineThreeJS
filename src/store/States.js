@@ -5,6 +5,8 @@ class States {
 
     opacityDots = 1 
 
+    wheelActive = true
+
     constructor() {
         makeAutoObservable(this)
     }
@@ -23,6 +25,14 @@ class States {
     
     setOpacityDots(value) {
         return this.opacityDots = value
+    }
+
+    getWheelActive() {
+        return this.wheelActive
+    }
+    
+    setWheelActive(value) {
+        return this.wheelActive = value
     }
 }
 

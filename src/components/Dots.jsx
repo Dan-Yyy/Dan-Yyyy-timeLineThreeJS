@@ -8,12 +8,15 @@ function Dots({
     // количество точек в длинну
         width, 
     // количество точек в ширину
-        height, transparent
+        height, 
+        wheel
     }) {
 
-    // const windowHeight = window.innerHeight
+    // скорость волны
     const wavespeed = 0.2;
+    // ширина волны
     const wavewidth = 200;
+    // амплитуда по высоте волны
     const waveheight = 100;
 
     const ref = useRef() 
@@ -21,9 +24,11 @@ function Dots({
     
     const { camera } = useThree()
 
+    // позиционирование и направления камеры
     camera.lookAt(0, 300, 1200)
     camera.position.set(0, 300, 1200)
 
+    // генерация начального положения точек волны
     const { vec, transform, positions } = useMemo(() => {
 
         // eslint-disable-next-line no-shadow
@@ -51,9 +56,30 @@ function Dots({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    useFrame(({clock}) => {
-        light.current.position.set(3500, 1000, 0)
+    useFrame(({clock }) => {
 
+        if(camera.position.x >= -300 && camera.position.x <= 7000) {
+            camera.position.x += wheel.current
+            camera.lookAt(camera.position.x, camera.position.y, 1200)
+        } else {
+            if(camera.position.x <= -300) {
+                camera.position.x = -290
+                camera.lookAt(camera.position.x, camera.position.y, 1200)
+            }
+            else {
+                if(camera.position.x >= 7000) {
+                    camera.position.x = 6990
+                    camera.lookAt(camera.position.x, camera.position.y, 1200)
+                }
+            }
+        }
+        
+
+        
+        
+        
+        light.current.position.set(3500, 1000, 0)
+        // расчет положения точек в момент по координате у (волна)
         for(let i = 0; i < width*2.5; i+=1) {
             const t = clock.elapsedTime;
             for(let j = 0; j < height; j+=1) {
@@ -74,8 +100,7 @@ function Dots({
     })
 
     return (
-        <>
-        
+        <>        
             <pointLight ref={light} distance={40000} intensity={8} color="purpure" />
             <instancedMesh ref={ref} args={[null, null, positions.length]}>
                 <sphereGeometry args={[1.3, 3, 2]} attach="geometry" />

@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { observer } from 'mobx-react-lite'
 import Dots from "./Dots"
 import Button from './Button'
@@ -34,19 +35,50 @@ import States from '../store/States'
 //     )
 //   }
 
+// function Mouse({mouseMove}) {
+//     // const { camera } = useThree()
+//     useFrame(({camera}) => {
+//         // console.log(camera.position)
+//         // const position = camera.position
+//         // camera.lookAt(position.x, position.y+mouse.y/1000, position.z)
+//         camera.position.lerp((camera.position.x, camera.position.y + mouseMove.current / 10, camera.position.z), 0.1)
+//     })
+// }
+
 function WavesThreeJS() {
 
     const [idPage, setIdPage] = useState(0)
+    const wheel = useRef(0)
+    const mouseMove = useRef(1)
 
     function buttonClick(id) {
         setIdPage(id)
         States.setVisibleButtons(false)
         States.setOpacityDots(0.5)
+        States.setWheelActive(false)
     }
 
+    const handleWheel = useCallback(({deltaY}) => {
+        
+        if (window.wheelTimeout) {
+            States.getWheelActive() && (wheel.current = deltaY)
+            window.clearTimeout(window.wheelTimeout);
+        }
+         
+        window.wheelTimeout = window.setTimeout(() => {
+            States.getWheelActive() && (wheel.current = 0)
+        }, 150);
+
+    }, [])
+
+    // const handleMouseMove = useCallback(({clientY: y}) => mouseMove.current = y, [])
+
     return (
-        <Canvas style={{ height: "100vh"}} camera={{fov: 75, far: 2000}}>
-            <Dots width={600} height={35}/>
+        <Canvas style={{ height: "100vh"}} camera={{fov: 75, far: 2000}}
+            onWheel={(e) => handleWheel(e)}
+            // onMouseMove={handleMouseMove}
+        >
+            <Dots width={600} height={35} wheel={wheel}/>
             {/* <Bloom>
             */}
                 <ambientLight /> 
@@ -54,6 +86,7 @@ function WavesThreeJS() {
             {/* </Bloom> */}
             
             <Light />
+            {/* <Mouse mouseMove={mouseMove}/> */}
             {
                 States.getVisibleButtons() && buttonData.map(item => (
                     <Button key={item.id} data={item} handleClick={buttonClick}/>

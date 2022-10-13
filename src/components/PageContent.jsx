@@ -10,10 +10,12 @@ import Slider from "./Slider"
 
 function PageContent({ content }) {
 
+    const heightWindow = window.innerHeight
+
     const { camera } = useThree()
 
     function handleClick() {
-
+        States.setWheelActive(true)
         let temp = 0
         const interval = setInterval(() => {
             if(temp < 50) {
@@ -25,20 +27,19 @@ function PageContent({ content }) {
                 States.setOpacityDots(1)
                 clearInterval(interval)
             } 
-        }, 30)
-
+        }, 30)        
     }  
     
     return(
-        <Html position={[0, -2052, 2792.5]} center>
-           <Container>
+        <Html position={[camera.position.x, -2150, camera.position.z]} center>
+           <Container height={heightWindow}>
                 <ButtonToTop onClick={handleClick}>
                     <LineContainer >
                         <Line/>
                     </LineContainer>
                     <ButtonName>back to timeLine</ButtonName>
                 </ButtonToTop>
-                <Wrap>
+                <Wrap className="title">
                     <Title>{content.title}</Title>
                     <SupTitle>{content.description}</SupTitle>
                 </Wrap>
@@ -55,9 +56,8 @@ export default observer(PageContent)
 
 const Container = styled.div`
     position: relative;
-    padding: 150px 0;
     width: 100vw;
-    height: 100vh;
+    height: ${((props) => props.height)}px;
     transition: all 0.5s;
     overflow-y: auto;
 `
@@ -68,6 +68,10 @@ const Wrap = styled.div`
 
     font-family: 'Source Sans Pro';
     color: white;
+
+    &.title {
+        margin: 150px auto 50px;
+    }
 `
 
 const Title = styled.div`
@@ -126,7 +130,7 @@ const ButtonName = styled.div`
 
 const ButtonToTop = styled.div`
     position: absolute;
-    top: 150px;
+    top: 0;
     left: calc(50% - 66px);
 
     display: flex;

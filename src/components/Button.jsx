@@ -23,10 +23,10 @@ export default function Button({data, handleClick}) {
         setOisition([position[0], y, position[2]])
     })
 
-    const { camera } = useThree()
+    var { camera } = useThree()
 
     function newHandleClick(id) {
-        handleClick(id);
+        handleClick(id); 
 
         let temp = 0
         const interval = setInterval(() => {
@@ -37,6 +37,7 @@ export default function Button({data, handleClick}) {
             }
             temp === 50 && clearInterval(interval)
         }, 30)
+
     }
 
 
